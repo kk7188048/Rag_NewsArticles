@@ -13,8 +13,9 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: 'https://ragfrontend-eight.vercel.app/',
-    methods: ['GET', 'POST']
+    origin: ['http://localhost:3000', 'https://ragfrontend-eight.vercel.app/'],
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
@@ -42,11 +43,12 @@ app.use('/api/', limiter);
 
 app.use(morgan('combined'));
 
-
 app.use(cors({
-  origin: 'https://ragfrontend-eight.vercel.app/',
+  origin: ["http://localhost:3000", "https://ragfrontend-eight.vercel.app/"],
+  methods: ["GET", "POST"],
   credentials: true
 }));
+
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
