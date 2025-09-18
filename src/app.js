@@ -6,47 +6,27 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const allowedOrigins = [
-  'https://ragfrontend-oqglrngyp-kk7188048s-projects.vercel.app', 
-  'http://localhost:3000'
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  credentials: true,
-  optionsSuccessStatus: 204
-};
-
-app.use(cors(corsOptions));
-
-app.options('*', cors(corsOptions));
-
-// Socket.IO with CORS
-const io = socketIo(server, {
-  cors: {
-    origin: allowedOrigins, 
-    methods: ['GET', 'POST'],
-    credentials: true
-  },
-  transports: ['websocket', 'polling']
-});
-
-
 const chatRoutes = require('./routes/chat');
 const ChatController = require('./controllers/chatController');
 
 const app = express();
 const server = http.createServer(app);
+
+const io = socketIo(server, {
+  cors: {
+    origin: [
+   "https://ragfrontend-eight.vercel.app",
+  "https://ragfrontend-kk7188048s-projects.vercel.app",
+  "https://ragfrontend-git-main-kk7188048s-projects.vercel.app",
+  "https://ragfrontend-oqglrngyp-kk7188048s-projects.vercel.app", 
+    'http://localhost:3000'                  
+  ],
+    methods: ['GET', 'POST'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
+  },
+  transports: ['websocket', 'polling']
+});
 
 
 
@@ -74,7 +54,18 @@ app.use('/api/', limiter);
 
 app.use(morgan('combined'));
 
-
+app.use(cors({
+  origin: [
+   "https://ragfrontend-eight.vercel.app",
+  "https://ragfrontend-kk7188048s-projects.vercel.app",
+  "https://ragfrontend-git-main-kk7188048s-projects.vercel.app",
+  "https://ragfrontend-oqglrngyp-kk7188048s-projects.vercel.app",
+    'http://localhost:3000'                  
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
