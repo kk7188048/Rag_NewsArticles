@@ -2,3 +2,11 @@
 node_modules
 package-lock.json
 
+node_modules/
+.env
+.env.local
+.env.development
+*.log
+data/news_articles/
+.cache/
+dist/

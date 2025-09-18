@@ -13,7 +13,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: 'https://ragfrontend-eight.vercel.app/',
     methods: ['GET', 'POST']
   }
 });
@@ -44,7 +44,7 @@ app.use(morgan('combined'));
 
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: 'https://ragfrontend-eight.vercel.app/',
   credentials: true
 }));
 
