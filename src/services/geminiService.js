@@ -8,12 +8,10 @@ class GeminiService {
 
   async generateResponse(query, retrievedDocuments) {
     try {
-      // Create context from retrieved documents
       const context = retrievedDocuments.map((doc, index) => 
         `Source ${index + 1} (${doc.metadata.source}): ${doc.document}`
       ).join('\n\n');
 
-      // Create the prompt
       const prompt = `
 You are a helpful and friendly news assistant.  
 Your main job is to answer user questions using the provided news articles.  
@@ -56,7 +54,6 @@ Answer:
     } catch (error) {
       console.error('Error generating response with Gemini:', error);
       
-      // Fallback response
       return {
         text: "I apologize, but I'm having trouble generating a response right now. Please try again later.",
         sources: []

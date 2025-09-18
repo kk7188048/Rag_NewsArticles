@@ -3,8 +3,8 @@ const { v4: uuidv4 } = require('uuid');
 
 class SessionService {
   constructor() {
-    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-    this.defaultTTL = 3600; // 1 hour in seconds
+    this.redis = new Redis(process.env.REDIS_URL);
+    this.defaultTTL = 3600;
     
     this.redis.on('connect', () => {
       console.log('Connected to Redis');
@@ -31,10 +31,8 @@ class SessionService {
         timestamp: Date.now()
       };
 
-      // Add message to list
       await this.redis.lpush(key, JSON.stringify(messageData));
       
-      // Set TTL for the session
       await this.redis.expire(key, this.defaultTTL);
       
       return true;
@@ -44,7 +42,6 @@ class SessionService {
     }
   }
 
-  // Get session history
   async getSessionHistory(sessionId, limit = 50) {
     try {
       const key = `session:${sessionId}:messages`;

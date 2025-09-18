@@ -16,35 +16,32 @@ class RAGService {
     console.log('Initializing RAG pipeline...');
     
     try {
-      // 1. Initialize vector store
       await this.vectorStore.initialize();
 
-      // 2. Check if we have articles in vector store
       const info = await this.vectorStore.getCollectionInfo();
       
       if (info.count === 0) {
-        console.log('No articles found, ingesting news data...');
+        console.log('No articles found');
         await this.ingestAndIndexArticles();
       } else {
-        console.log(`Found ${info.count} articles in vector store`);
+        console.log(`Found ${info.count} articles`);
       }
 
       this.isInitialized = true;
-      console.log('RAG pipeline initialized successfully');
+      console.log('RAG initialized successfully');
       
     } catch (error) {
-      console.error('Error initializing RAG pipeline:', error);
+      console.error('Error initializing RAG :', error);
       throw error;
     }
   }
 
-  // In your RAGService or initialization script
 async ingestAndIndexArticles() {
   try {
     let articles = await this.newsService.loadArticles();
     
     if (articles.length === 0) {
-      console.log('🗞️ Scraping fresh articles...');
+      console.log('Scraping articles...');
       
       // Choose categories for scraping
       const categories = ['world', 'technology', 'business', 'sports'];
@@ -52,7 +49,6 @@ async ingestAndIndexArticles() {
       articles = this.newsService.getArticles();
       
       if (articles.length === 0) {
-        console.log('📋 Loading comprehensive sample data...');
         await this.newsService.loadSampleData();
         articles = this.newsService.getArticles();
       }
@@ -60,19 +56,17 @@ async ingestAndIndexArticles() {
       await this.newsService.saveArticles();
     }
 
-    // Show statistics
     const stats = this.newsService.getArticleStats();
-    console.log('📊 Article distribution by category:', stats);
 
     // Generate embeddings and store
     const articlesWithEmbeddings = await this.embeddingService.embedArticles(articles);
     await this.vectorStore.addArticles(articlesWithEmbeddings);
 
-    console.log(`✅ Successfully indexed ${articles.length} articles across ${Object.keys(stats).length} categories`);
+    console.log(`Successfully indexed ${articles.length} articles across ${Object.keys(stats).length} categories`);
     return articles.length;
     
   } catch (error) {
-    console.error('❌ Error ingesting articles:', error);
+    console.error('Error ingesting articles:', error);
     throw error;
   }
 }
@@ -84,15 +78,12 @@ async ingestAndIndexArticles() {
     }
 
     try {
-      // 1. Generate embedding for the query
       console.log(`Processing query: ${query}`);
       const queryEmbedding = await this.embeddingService.embedQuery(query);
 
-      // 2. Search for similar documents
       const retrievedDocs = await this.vectorStore.searchSimilar(queryEmbedding, 5);
       console.log(`Retrieved ${retrievedDocs.length} relevant documents`);
 
-      // 3. Generate response using Gemini
       const response = await this.geminiService.generateResponse(query, retrievedDocs);
 
       return {

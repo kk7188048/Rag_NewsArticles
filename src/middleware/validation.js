@@ -1,6 +1,5 @@
 const { body, param, validationResult } = require('express-validator');
 
-// Validation middleware
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -12,7 +11,6 @@ const validate = (req, res, next) => {
   next();
 };
 
-// Message validation rules
 const validateMessage = [
   body('sessionId')
     .isUUID()

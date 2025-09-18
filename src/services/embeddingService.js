@@ -35,14 +35,11 @@ class EmbeddingService {
         console.error('API response:', error.response.data);
       }
       
-      // Fallback for development without API key or connection
       return this.generateSimpleEmbeddings(texts);
     }
   }
 
-  // Simple fallback embedding (for development only)
   generateSimpleEmbeddings(texts) {
-    console.log('Using simple embedding fallback...');
     return texts.map(text => {
       const vector = new Array(384).fill(0);
       for (let i = 0; i < text.length; i++) {
@@ -54,7 +51,7 @@ class EmbeddingService {
   }
 
   async embedArticles(articles) {
-    console.log(`Embedding ${articles.length} articles...`);
+    console.log(`${articles.length} articles...`);
     const texts = articles.map(article => 
       `${article.title}\n${article.content || article.description}`
     );

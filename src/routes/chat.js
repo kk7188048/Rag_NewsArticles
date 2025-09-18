@@ -1,12 +1,10 @@
 const express = require('express');
-const ChatController = require('../controllers/chatController'); // ✅ Import the class
+const ChatController = require('../controllers/chatController'); 
 
 const router = express.Router();
 
-// ✅ Create instance here
 const chatController = new ChatController();
 
-// Initialize controller (ensure RAG pipeline is ready)
 router.use(async (req, res, next) => {
   try {
     await chatController.initialize();

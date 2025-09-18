@@ -7,14 +7,12 @@ class NewsIngestionService {
   constructor() {
     this.articles = [];
     this.dataDir = path.join(__dirname, '../../data/news_articles');
-    this.maxArticles = 100; // Increased for better coverage
+    this.maxArticles = 100; 
     this.categories = this.getRSSFeeds();
   }
 
-  // Comprehensive RSS feed sources categorized
   getRSSFeeds() {
     return {
-      // World News & Current Affairs
       world: [
         { url: 'https://feeds.bbci.co.uk/news/rss.xml', name: 'BBC News' },
         { url: 'http://rss.cnn.com/rss/edition.rss', name: 'CNN' },
@@ -87,9 +85,8 @@ class NewsIngestionService {
     }
   }
 
-  // Enhanced RSS scraping with category support
   async scrapeFromRSS(selectedCategories = ['world', 'technology', 'business']) {
-    console.log(`🗞️ Starting RSS feed scraping for categories: ${selectedCategories.join(', ')}`);
+    // console.log(`Starting RSS feed scraping for categories: ${selectedCategories.join(', ')}`);
     
     const articlesPerCategory = Math.ceil(this.maxArticles / selectedCategories.length);
     
@@ -142,26 +139,23 @@ class NewsIngestionService {
           }
         });
 
-        console.log(`    ✅ Got ${articleCount} articles from ${feed.name}`);
+        console.log(`${articleCount} articles from ${feed.name}`);
         
-        // Small delay to be respectful to servers
         await new Promise(resolve => setTimeout(resolve, 500));
         
       } catch (error) {
-        console.error(`    ❌ Error scraping ${feed.name}:`, error.message);
+        console.error(`Error scraping ${feed.name}:`, error.message);
       }
     }
   }
 
   parseArticleFromRSS($item, sourceName, category) {
-    // Extract content with multiple fallbacks
     const title = $item.find('title').text().trim();
     const description = $item.find('description').text().trim();
     const content = $item.find('content\\:encoded').text().trim() || 
                    $item.find('content').text().trim() || 
                    description;
     
-    // Clean HTML tags from content
     const cleanContent = this.cleanHtmlContent(content);
     const cleanDescription = this.cleanHtmlContent(description);
 
@@ -184,7 +178,6 @@ class NewsIngestionService {
   cleanHtmlContent(html) {
     if (!html) return '';
     
-    // Remove HTML tags but preserve text content
     const $ = cheerio.load(html);
     return $.text().trim();
   }
@@ -193,8 +186,8 @@ class NewsIngestionService {
     if (!text) return '';
     
     return text
-      .replace(/\s+/g, ' ') // Replace multiple whitespace with single space
-      .replace(/[^\x20-\x7E]/g, '') // Remove non-ASCII characters
+      .replace(/\s+/g, ' ') 
+      .replace(/[^\x20-\x7E]/g, '')
       .trim();
   }
 
@@ -205,7 +198,6 @@ class NewsIngestionService {
            (article.content?.length > 50 || article.description?.length > 50);
   }
 
-  // Enhanced sample data with categories
   async loadSampleData() {
     const sampleArticles = [
       // Technology
@@ -216,7 +208,7 @@ class NewsIngestionService {
         description: "Major AI breakthrough achieves human-level language understanding",
         source: "TechNews",
         category: "technology",
-        pubDate: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+        pubDate: new Date(Date.now() - 86400000).toISOString(), 
         link: "https://example.com/ai-breakthrough",
         contentLength: 400
       },
@@ -229,7 +221,7 @@ class NewsIngestionService {
         description: "Markets surge on positive economic data and growth forecasts",
         source: "Financial Times",
         category: "business", 
-        pubDate: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
+        pubDate: new Date(Date.now() - 43200000).toISOString(), 
         link: "https://example.com/market-rally",
         contentLength: 380
       },
@@ -242,7 +234,7 @@ class NewsIngestionService {
         description: "Historic climate agreement reached with binding carbon reduction targets",
         source: "Global News",
         category: "world",
-        pubDate: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+        pubDate: new Date(Date.now() - 172800000).toISOString(),
         link: "https://example.com/climate-summit",
         contentLength: 420
       },
@@ -255,7 +247,7 @@ class NewsIngestionService {
         description: "Underdog team reaches championship finals after stunning upset victory",
         source: "Sports Central",
         category: "sports",
-        pubDate: new Date(Date.now() - 21600000).toISOString(), // 6 hours ago
+        pubDate: new Date(Date.now() - 21600000).toISOString(),
         link: "https://example.com/championship-upset",
         contentLength: 350
       },
@@ -288,10 +280,8 @@ class NewsIngestionService {
     ];
 
     this.articles = sampleArticles;
-    console.log(`📋 Loaded ${this.articles.length} sample articles across ${new Set(sampleArticles.map(a => a.category)).size} categories`);
   }
 
-  // Save articles with metadata
   async saveArticles() {
     await this.ensureDataDirectory();
     const filePath = path.join(this.dataDir, 'articles.json');
@@ -313,7 +303,6 @@ class NewsIngestionService {
     console.log(`📊 Categories: ${Object.keys(metadata.categories).join(', ')}`);
   }
 
-  // Load articles with backward compatibility
   async loadArticles() {
     await this.ensureDataDirectory();
     const filePath = path.join(this.dataDir, 'articles.json');
@@ -325,19 +314,17 @@ class NewsIngestionService {
       // Handle both old and new format
       if (parsed.articles) {
         this.articles = parsed.articles;
-        console.log(`📂 Loaded ${this.articles.length} articles from file`);
         if (parsed.metadata) {
-          console.log(`📊 Categories: ${Object.keys(parsed.metadata.categories).join(', ')}`);
+          console.log(`Categories: ${Object.keys(parsed.metadata.categories).join(', ')}`);
         }
       } else {
-        // Old format compatibility
         this.articles = parsed;
-        console.log(`📂 Loaded ${this.articles.length} articles (legacy format)`);
+        console.log(`${this.articles.length} articles (legacy format)`);
       }
       
       return this.articles;
     } catch (error) {
-      console.log('📁 No existing articles file found, will create new one');
+      console.log('No existing articles file found, will create new one');
       return [];
     }
   }
@@ -351,12 +338,10 @@ class NewsIngestionService {
     return stats;
   }
 
-  // Get articles by category
   getArticlesByCategory(category) {
     return this.articles.filter(article => article.category === category);
   }
 
-  // Get recent articles (last N days)
   getRecentArticles(days = 7) {
     const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
     return this.articles.filter(article => {
